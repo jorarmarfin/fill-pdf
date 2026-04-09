@@ -81,6 +81,13 @@
     }
     #generate-btn:hover:not(:disabled) { background: #c73550; }
 
+    #insert-btn.active {
+      background: #e94560;
+      border-color: #c73550;
+      font-weight: 600;
+    }
+    #insert-btn.active:hover:not(:disabled) { background: #c73550; }
+
     #page-info {
       font-size: 0.82rem;
       color: #aaa;
@@ -138,7 +145,7 @@
     #canvas-wrapper {
       position: relative;
       box-shadow: 0 8px 32px rgba(0,0,0,0.6);
-      cursor: crosshair;
+      cursor: default;
       flex-shrink: 0;
     }
 
@@ -257,6 +264,12 @@
   <div class="sep"></div>
 
   <div class="group">
+    <button id="insert-btn" disabled title="Activar/desactivar inserción de texto">✏ Insertar texto</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="group">
     <span class="field-label">Tamaño:</span>
     <input type="number" id="font-size" value="12" min="6" max="72">
     <span class="field-label">Color:</span>
@@ -289,7 +302,7 @@
 </main>
 
 <div id="hint" style="display:none;">
-  Click en el PDF para agregar texto &nbsp;·&nbsp; Arrastrá ⠿ para mover
+  Activá ✏ Insertar texto y hacé click en el PDF &nbsp;·&nbsp; Arrastrá ⠿ para mover
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

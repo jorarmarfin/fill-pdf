@@ -10,6 +10,7 @@ let originalPdfBytes = null;
 let labels         = [];   // { id, page, pdfX, pdfY, text, fontSize, color }
 let labelIdCounter = 0;
 let dragging       = false;
+let insertMode     = false;
 
 // ─── Elements ─────────────────────────────────────────────────────────────────
 const canvas        = document.getElementById('pdf-canvas');
@@ -27,6 +28,7 @@ const zoomOutBtn    = document.getElementById('zoom-out');
 const canvasWrapper = document.getElementById('canvas-wrapper');
 const emptyState    = document.getElementById('empty-state');
 const hint          = document.getElementById('hint');
+const insertBtn     = document.getElementById('insert-btn');
 
 // ─── Load PDF ─────────────────────────────────────────────────────────────────
 async function loadPDF(arrayBuffer) {
@@ -43,6 +45,11 @@ async function loadPDF(arrayBuffer) {
   generateBtn.disabled = false;
   zoomInBtn.disabled   = false;
   zoomOutBtn.disabled  = false;
+  insertBtn.disabled   = false;
+
+  insertMode = false;
+  insertBtn.classList.remove('active');
+  canvasWrapper.style.cursor = 'default';
 
   await renderPage(currentPage);
 }
@@ -124,8 +131,8 @@ function createLabelEl(label) {
   });
   controls.appendChild(deleteBtn);
 
-  el.appendChild(controls);
   el.appendChild(input);
+  el.appendChild(controls);
   labelsLayer.appendChild(el);
 }
 
@@ -174,7 +181,7 @@ function makeDraggable(el, handle, label) {
 
 // ─── Canvas click → add label ─────────────────────────────────────────────────
 canvas.addEventListener('click', e => {
-  if (dragging || !pdfJsDoc) return;
+  if (dragging || !pdfJsDoc || !insertMode) return;
 
   const rect  = canvas.getBoundingClientRect();
   const cx    = e.clientX - rect.left;
@@ -220,9 +227,13 @@ async function generatePDF() {
       if (!page) continue;
 
       const [r, g, b] = hexToRgb(label.color);
+      // El div se posiciona con su base (bottom) en pdfY, pero el baseline
+      // visual de la fuente queda ~0.35 × fontSize por encima. Se corrige
+      // para que el PDF coincida con lo que se ve en la pantalla.
+      const yOffset = label.fontSize * 0.35;
       page.drawText(label.text, {
         x:     label.pdfX,
-        y:     label.pdfY,
+        y:     label.pdfY + yOffset,
         size:  label.fontSize,
         font,
         color: rgb(r, g, b),
@@ -256,6 +267,13 @@ function downloadFile(bytes, filename, mime) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ─── Insert mode toggle ───────────────────────────────────────────────────────
+insertBtn.addEventListener('click', () => {
+  insertMode = !insertMode;
+  insertBtn.classList.toggle('active', insertMode);
+  canvasWrapper.style.cursor = insertMode ? 'crosshair' : 'default';
+});
 
 // ─── Toolbar events ───────────────────────────────────────────────────────────
 fileInput.addEventListener('change', async e => {
