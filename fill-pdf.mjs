@@ -22,7 +22,7 @@ const data = {
   horario: 'X',
   dia: '06',
   mes: 'Abril',
-  anio: '6',
+  anio: '9',
   linea: 'Transformación digital y sistemas de información',
 }
 

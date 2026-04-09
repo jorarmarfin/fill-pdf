@@ -20,7 +20,7 @@ const data = {
   titulo2: 'y matrícula en la Escuela de Posgrado de la Facultad de Ingeniería Industrial y de Sistemas de la UNI',
   grado: 'Ingeniero de Software',
   horario: 'X',
-  dia: '06',
+  dia: '09',
   mes: 'Abril',
   anio: '6',
   linea: 'Transformación digital y sistemas de información',
