@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fill PDF</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: #16213e;
+      border-bottom: 1px solid #0f3460;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e94560;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .sep {
+      width: 1px;
+      height: 24px;
+      background: #0f3460;
+    }
+
+    .group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    label.upload-btn {
+      background: #0f3460;
+      color: #eee;
+      border: 1px solid #e94560;
+      border-radius: 6px;
+      padding: 5px 12px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    label.upload-btn:hover { background: #e94560; }
+
+    #file-input { display: none; }
+
+    button {
+      background: #0f3460;
+      color: #eee;
+      border: 1px solid #1a4a8a;
+      border-radius: 6px;
+      padding: 5px 11px;
+      cursor: pointer;
+      font-size: 0.82rem;
+      transition: background 0.15s;
+    }
+    button:hover:not(:disabled) { background: #1a4a8a; }
+    button:disabled { opacity: 0.35; cursor: default; }
+
+    #generate-btn {
+      background: #e94560;
+      border-color: #c73550;
+      font-weight: 600;
+    }
+    #generate-btn:hover:not(:disabled) { background: #c73550; }
+
+    #page-info {
+      font-size: 0.82rem;
+      color: #aaa;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    input[type="number"] {
+      background: #0f3460;
+      color: #eee;
+      border: 1px solid #1a4a8a;
+      border-radius: 6px;
+      padding: 4px 7px;
+      width: 58px;
+      font-size: 0.82rem;
+    }
+
+    input[type="color"] {
+      background: none;
+      border: 1px solid #1a4a8a;
+      border-radius: 6px;
+      width: 34px;
+      height: 28px;
+      padding: 2px;
+      cursor: pointer;
+    }
+
+    .field-label {
+      font-size: 0.78rem;
+      color: #aaa;
+    }
+
+    /* ── Main area ── */
+    #main {
+      flex: 1;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 24px;
+    }
+
+    #empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 14px;
+      color: #444;
+      pointer-events: none;
+    }
+    #empty-state p { font-size: 0.95rem; }
+
+    #canvas-wrapper {
+      position: relative;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      cursor: crosshair;
+      flex-shrink: 0;
+    }
+
+    #pdf-canvas { display: block; }
+
+    #labels-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    /* ── Labels ── */
+    .label {
+      position: absolute;
+      pointer-events: all;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      transform: translate(0, -100%);
+    }
+
+    .label-controls {
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.15s;
+      flex-shrink: 0;
+    }
+    .label:hover .label-controls { opacity: 1; }
+
+    .drag-handle {
+      cursor: grab;
+      color: #e94560;
+      font-size: 15px;
+      user-select: none;
+      padding: 0 3px;
+      line-height: 1;
+    }
+    .drag-handle:active { cursor: grabbing; }
+
+    .label input[type="text"] {
+      background: transparent;
+      border: none;
+      border-bottom: 1px dashed rgba(233, 69, 96, 0.7);
+      outline: none;
+      padding: 0 2px;
+      min-width: 60px;
+      font-family: Helvetica, Arial, sans-serif;
+      line-height: 1.2;
+    }
+    .label input[type="text"]:focus {
+      border-bottom-color: #e94560;
+      background: rgba(0,0,0,0.15);
+    }
+    .label input[type="text"]::placeholder { color: rgba(200,200,200,0.4); }
+
+    .delete-btn {
+      background: rgba(233, 69, 96, 0.85) !important;
+      border: none !important;
+      border-radius: 50% !important;
+      width: 16px !important;
+      height: 16px !important;
+      padding: 0 !important;
+      font-size: 12px !important;
+      line-height: 16px !important;
+      text-align: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 3px;
+    }
+    .delete-btn:hover { background: #e94560 !important; }
+
+    #hint {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      background: rgba(15, 52, 96, 0.92);
+      color: #888;
+      font-size: 0.72rem;
+      padding: 7px 11px;
+      border-radius: 8px;
+      border: 1px solid #1a4a8a;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>FILL PDF</h1>
+
+  <div class="sep"></div>
+
+  <div class="group">
+    <label class="upload-btn" for="file-input">📂 Abrir PDF</label>
+    <input type="file" id="file-input" accept=".pdf">
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="group">
+    <button id="prev-page" disabled>◀</button>
+    <span id="page-info">—</span>
+    <button id="next-page" disabled>▶</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="group">
+    <button id="zoom-out" disabled>−</button>
+    <button id="zoom-in"  disabled>+</button>
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="group">
+    <span class="field-label">Tamaño:</span>
+    <input type="number" id="font-size" value="12" min="6" max="72">
+    <span class="field-label">Color:</span>
+    <input type="color" id="color" value="#000000">
+  </div>
+
+  <div class="sep"></div>
+
+  <div class="group">
+    <button id="generate-btn" disabled>⬇ Generar PDF</button>
+  </div>
+</header>
+
+<main id="main">
+  <div id="empty-state">
+    <svg width="72" height="72" viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <polyline points="14 2 14 8 20 8"/>
+      <line x1="16" y1="13" x2="8" y2="13"/>
+      <line x1="16" y1="17" x2="8" y2="17"/>
+    </svg>
+    <p>Abrí un PDF para empezar</p>
+  </div>
+
+  <div id="canvas-wrapper" style="display:none;">
+    <canvas id="pdf-canvas"></canvas>
+    <div id="labels-layer"></div>
+  </div>
+</main>
+
+<div id="hint" style="display:none;">
+  Click en el PDF para agregar texto &nbsp;·&nbsp; Arrastrá ⠿ para mover
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
