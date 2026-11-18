@@ -62,7 +62,10 @@
       transition: filter 0.15s;
       white-space: nowrap;
     }
-    .upload-btn:hover { filter: brightness(1.1); }
+    button.upload-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #7B2FF7, #00A3FF);
+      filter: brightness(1.12);
+    }
 
     #file-input { display: none; }
 
