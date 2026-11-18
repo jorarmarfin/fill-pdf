@@ -3,7 +3,7 @@
 ## Estado actual (versión web, abril 2026)
 - Editor visual de PDF: carga PDF, lo renderiza con PDF.js (CDN), click para poner texto, arrastrar, y genera PDF con pdf-lib.
 - Todo en el browser, sin backend. Archivos: `index.html`, `app.js` (~300 líneas, JS vanilla).
-- Scripts Node con coordenadas fijas: `fill-pdf.mjs` (solicitud.pdf).
+- Scripts Node con coordenadas fijas: eliminados (todo se hace desde el sistema).
 - Dependencia: `pdf-lib` (yarn 4).
 - Ojo: scripts y PDFs llenados contienen datos personales (código, correo, teléfono).
 
@@ -47,4 +47,4 @@ git push origin legacy-web v1-web
 - [x] Scripts: `run.sh`, `scripts/deploy-linux.sh`, `scripts/deploy-windows.ps1` (MSIX).
 - [x] CI `.github/workflows/release.yml` (solo en release published).
 - [ ] Modo plantilla (JSON).
-- [ ] Mover PDFs/scripts con datos personales a `examples/` y limpiar datos.
+- [x] Eliminar PDFs/scripts/context con datos personales (todo por el sistema).

@@ -55,7 +55,9 @@ http://localhost:3000
 ```
 fill-pdf/
 ├── index.html   # UI: barra de herramientas + canvas + overlay de etiquetas
-├── app.js       # Lógica: carga PDF, manejo de etiquetas, generación
-├── package.json
-└── solicitud.pdf  # PDF de ejemplo
+├── src/app.js   # Lógica: carga PDF, manejo de etiquetas, generación
+├── src-tauri/   # App de escritorio (Tauri v2)
+├── scripts/     # Deploy manual Linux (.deb/.AppImage) y Windows (MSIX)
+├── run.sh       # Levantar / probar / compilar
+└── package.json
 ```
