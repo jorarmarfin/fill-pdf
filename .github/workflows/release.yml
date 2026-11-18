@@ -1,9 +1,11 @@
 name: Release
 
-# Solo corre al publicar un release en GitHub
+# Corre al publicar un release en GitHub, o a mano desde la pestaña Actions
+# (en modo manual los paquetes quedan como artefactos del run, no se suben a un release)
 on:
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -25,7 +27,12 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential libssl-dev libxdo-dev libayatana-appindicator3-dev librsvg2-dev
       - run: yarn install --immutable
       - run: ./scripts/deploy-linux.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fillpdf-linux
+          path: release/linux/*
       - name: Subir al release
+        if: github.event_name == 'release'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: gh release upload "${{ github.event.release.tag_name }}" release/linux/* --clobber
 
@@ -55,7 +62,12 @@ jobs:
           } else {
             ./scripts/deploy-windows.ps1
           }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: fillpdf-windows-msix
+          path: release/windows/*.msix
       - name: Subir al release
+        if: github.event_name == 'release'
         shell: pwsh
         env: { GH_TOKEN: "${{ github.token }}" }
         run: gh release upload "${{ github.event.release.tag_name }}" (Get-ChildItem release/windows/*.msix).FullName --clobber

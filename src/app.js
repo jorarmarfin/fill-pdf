@@ -307,13 +307,18 @@ zoomOutBtn.addEventListener('click', async () => {
 
 generateBtn.addEventListener('click', generatePDF);
 
+// ─── Versión ──────────────────────────────────────────────────────────────────
+document.getElementById('version-badge').textContent = 'v' + __APP_VERSION__;
+
 // ─── Créditos ─────────────────────────────────────────────────────────────────
 const creditsModal = document.getElementById('credits-modal');
 
 document.getElementById('credits-btn').addEventListener('click', async () => {
   try {
-    document.getElementById('app-version').textContent = 'v' + await getVersion();
-  } catch { /* fuera de Tauri */ }
+    document.getElementById('app-version').textContent = 'Versión ' + await getVersion();
+  } catch {
+    document.getElementById('app-version').textContent = 'Versión ' + __APP_VERSION__;
+  }
   creditsModal.classList.add('open');
 });
 document.getElementById('credits-close').addEventListener('click', () =>
