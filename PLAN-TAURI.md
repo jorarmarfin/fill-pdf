@@ -3,7 +3,7 @@
 ## Estado actual (versión web, abril 2026)
 - Editor visual de PDF: carga PDF, lo renderiza con PDF.js (CDN), click para poner texto, arrastrar, y genera PDF con pdf-lib.
 - Todo en el browser, sin backend. Archivos: `index.html`, `app.js` (~300 líneas, JS vanilla).
-- Scripts Node con coordenadas fijas: `fill-pdf.mjs` (solicitud.pdf) y `fill-compromiso-pdf.mjs` (compromiso.pdf).
+- Scripts Node con coordenadas fijas: `fill-pdf.mjs` (solicitud.pdf).
 - Dependencia: `pdf-lib` (yarn 4).
 - Ojo: scripts y PDFs llenados contienen datos personales (código, correo, teléfono).
 
@@ -18,7 +18,7 @@
 ## Cambios necesarios con Tauri
 1. Bundlear PDF.js y pdf-lib local (npm + vite), sin CDN.
 2. Diálogos nativos: abrir PDF (`plugin-dialog`), guardar (`plugin-fs`) en vez de `<input file>` + descarga Blob.
-3. Scripts de plantillas (solicitud/compromiso) -> pantalla de formulario.
+3. Scripts de plantillas (solicitud) -> pantalla de formulario.
 4. Linux: instalar `webkit2gtk-4.1` y deps de Tauri.
 
 ## Mejora propuesta: modo "plantilla"

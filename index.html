@@ -9,16 +9,17 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #130A2B;
-      color: #eee;
+      background: #F4F6FB;
+      color: #1E1B3A;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
 
     header {
-      background: #1C1040;
-      border-bottom: 1px solid #2B1A66;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E3E6F0;
+      box-shadow: 0 1px 8px rgba(30,27,58,0.06);
       padding: 10px 16px;
       display: flex;
       align-items: center;
@@ -27,17 +28,20 @@
     }
 
     h1 {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #FF2D6A;
-      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0;
       white-space: nowrap;
+      color: #2A1160;
     }
 
     .sep {
       width: 1px;
       height: 24px;
-      background: #2B1A66;
+      background: #E3E6F0;
     }
 
     .group {
@@ -47,35 +51,37 @@
     }
 
     .upload-btn {
-      background: #2B1A66;
-      color: #eee;
-      border: 1px solid #FF2D6A;
+      background: linear-gradient(135deg, #7B2FF7, #00A3FF);
+      color: #fff;
+      border: none;
       border-radius: 6px;
-      padding: 5px 12px;
+      padding: 6px 13px;
       cursor: pointer;
       font-size: 0.82rem;
-      transition: background 0.15s;
+      font-weight: 600;
+      transition: filter 0.15s;
       white-space: nowrap;
     }
-    .upload-btn:hover { background: #FF2D6A; }
+    .upload-btn:hover { filter: brightness(1.1); }
 
     #file-input { display: none; }
 
     button {
-      background: #2B1A66;
-      color: #eee;
-      border: 1px solid #5B3FD6;
+      background: #FFFFFF;
+      color: #3A2F7A;
+      border: 1px solid #CFC8F5;
       border-radius: 6px;
       padding: 5px 11px;
       cursor: pointer;
       font-size: 0.82rem;
       transition: background 0.15s;
     }
-    button:hover:not(:disabled) { background: #5B3FD6; }
+    button:hover:not(:disabled) { background: #EFE9FF; }
     button:disabled { opacity: 0.35; cursor: default; }
 
     #generate-btn {
       background: #FF2D6A;
+      color: #fff;
       border-color: #D91F58;
       font-weight: 600;
     }
@@ -83,6 +89,7 @@
 
     #insert-btn.active {
       background: #FF2D6A;
+      color: #fff;
       border-color: #D91F58;
       font-weight: 600;
     }
@@ -90,15 +97,15 @@
 
     #page-info {
       font-size: 0.82rem;
-      color: #aaa;
+      color: #666;
       min-width: 80px;
       text-align: center;
     }
 
     input[type="number"] {
-      background: #2B1A66;
-      color: #eee;
-      border: 1px solid #5B3FD6;
+      background: #fff;
+      color: #1E1B3A;
+      border: 1px solid #CFC8F5;
       border-radius: 6px;
       padding: 4px 7px;
       width: 58px;
@@ -107,7 +114,7 @@
 
     input[type="color"] {
       background: none;
-      border: 1px solid #5B3FD6;
+      border: 1px solid #CFC8F5;
       border-radius: 6px;
       width: 34px;
       height: 28px;
@@ -117,7 +124,7 @@
 
     .field-label {
       font-size: 0.78rem;
-      color: #aaa;
+      color: #666;
     }
 
     /* ── Main area ── */
@@ -137,14 +144,14 @@
       justify-content: center;
       height: 100%;
       gap: 14px;
-      color: #444;
+      color: #9AA0B8;
       pointer-events: none;
     }
     #empty-state p { font-size: 0.95rem; }
 
     #canvas-wrapper {
       position: relative;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 32px rgba(30,27,58,0.18);
       cursor: default;
       flex-shrink: 0;
     }
@@ -200,9 +207,9 @@
     }
     .label input[type="text"]:focus {
       border-bottom-color: #FF2D6A;
-      background: rgba(0,0,0,0.15);
+      background: rgba(123,47,247,0.08);
     }
-    .label input[type="text"]::placeholder { color: rgba(200,200,200,0.4); }
+    .label input[type="text"]::placeholder { color: rgba(0,0,0,0.35); }
 
     .delete-btn {
       background: rgba(255, 45, 106, 0.85) !important;
@@ -214,6 +221,7 @@
       font-size: 12px !important;
       line-height: 16px !important;
       text-align: center;
+      color: #fff;
       cursor: pointer;
       flex-shrink: 0;
       margin-left: 3px;
@@ -224,12 +232,13 @@
       position: fixed;
       bottom: 14px;
       right: 14px;
-      background: rgba(43, 26, 102, 0.92);
-      color: #888;
+      background: #fff;
+      color: #666;
       font-size: 0.72rem;
       padding: 7px 11px;
       border-radius: 8px;
-      border: 1px solid #5B3FD6;
+      border: 1px solid #CFC8F5;
+      box-shadow: 0 2px 10px rgba(30,27,58,0.1);
       pointer-events: none;
     }
 
@@ -237,40 +246,40 @@
     #credits-modal {
       position: fixed; inset: 0; z-index: 100;
       display: none; align-items: center; justify-content: center;
-      background: rgba(10, 5, 30, 0.75);
+      background: rgba(30, 27, 58, 0.45);
     }
     #credits-modal.open { display: flex; }
     .credits-card {
       width: min(440px, 92vw);
-      background: #1C1040;
-      border: 1px solid #5B3FD6;
+      background: #fff;
+      border: 1px solid #E3E6F0;
       border-radius: 14px;
       padding: 28px 28px 22px;
       text-align: center;
-      box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+      box-shadow: 0 16px 48px rgba(30,27,58,0.25);
     }
     .credits-card img { width: 72px; height: 72px; }
-    .credits-card h2 { margin: 8px 0 0; font-size: 1.4rem; }
+    .credits-card h2 { margin: 8px 0 0; font-size: 1.4rem; color: #2A1160; }
     .credits-card h2 span { color: #FF2D6A; }
     .credits-card .ver { color: #888; font-size: 0.75rem; margin-top: 2px; }
     .credits-card .who { margin-top: 18px; font-size: 1rem; font-weight: 600; }
-    .credits-card .role { color: #00A3FF; font-size: 0.85rem; margin-top: 2px; }
-    .credits-card .bio { color: #aaa; font-size: 0.8rem; line-height: 1.5; margin: 10px 0 0; }
+    .credits-card .role { color: #0084D6; font-size: 0.85rem; margin-top: 2px; }
+    .credits-card .bio { color: #555; font-size: 0.8rem; line-height: 1.5; margin: 10px 0 0; }
     .credits-links { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
     .credits-links a {
-      color: #eee; text-decoration: none; font-size: 0.8rem;
-      border: 1px solid #5B3FD6; border-radius: 6px; padding: 5px 12px;
-      background: #2B1A66;
+      color: #3A2F7A; text-decoration: none; font-size: 0.8rem;
+      border: 1px solid #CFC8F5; border-radius: 6px; padding: 5px 12px;
+      background: #F3EEFF;
     }
-    .credits-links a:hover { background: #7B2FF7; }
-    .credits-card .stack { color: #777; font-size: 0.7rem; margin-top: 16px; }
+    .credits-links a:hover { background: #7B2FF7; color: #fff; }
+    .credits-card .stack { color: #888; font-size: 0.7rem; margin-top: 16px; }
     #credits-close { margin-top: 14px; }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>FILL PDF</h1>
+  <h1><img src="/icon.png" alt="" width="42" height="42"><span>Fill<span style="color:#FF2D6A;">PDF</span></span></h1>
 
   <div class="sep"></div>
 

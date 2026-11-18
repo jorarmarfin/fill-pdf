@@ -14,11 +14,8 @@ fill-pdf/
 ├── index.html              # GUI web — barra de herramientas + canvas + overlay
 ├── app.js                  # Lógica de la GUI (carga, inserción, generación de PDF)
 ├── fill-pdf.mjs            # Script Node.js para llenar solicitud.pdf
-├── fill-compromiso-pdf.mjs # Script Node.js para llenar compromiso.pdf
 ├── solicitud.pdf           # Plantilla: Solicitud de aprobación del plan de tesis PT
-├── compromiso.pdf          # Plantilla: Compromiso del estudiante
 ├── Solicitud-llenada.pdf   # Output del script fill-pdf.mjs
-├── compromiso-llenada.pdf  # Output del script fill-compromiso-pdf.mjs
 ├── package.json            # type: module, depende solo de pdf-lib
 └── yarn.lock
 ```
@@ -54,7 +51,6 @@ npx serve .
 
 ```bash
 node fill-pdf.mjs            # genera Solicitud-llenada.pdf
-node fill-compromiso-pdf.mjs # genera compromiso-llenada.pdf
 ```
 
 ---
@@ -221,5 +217,4 @@ Los cambios de los bugs 1, 2 y 3 (en app.js e index.html) están sin commitear a
 - Guardar/cargar el estado de las etiquetas (JSON) para retomar el trabajo.
 - Soporte para fuentes con tildes y caracteres especiales (actualmente Helvetica via pdf-lib cubre latin básico).
 - Permitir seleccionar la fuente en la GUI (actualmente fijo a Helvetica en el PDF generado).
-- El script `fill-compromiso-pdf.mjs` tiene coordenadas parcialmente calibradas — faltan campos de la página 2.
 - Considerar empaquetar como app de escritorio (Electron/Tauri) para evitar depender de un servidor HTTP.
