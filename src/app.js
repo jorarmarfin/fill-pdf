@@ -1,5 +1,12 @@
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+import * as pdfjsLib from 'pdfjs-dist/build/pdf.js';
+import workerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { open, save, message } from '@tauri-apps/plugin-dialog';
+import { readFile, writeFile } from '@tauri-apps/plugin-fs';
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { getVersion } from '@tauri-apps/api/app';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
 
 // ─── State ────────────────────────────────────────────────────────────────────
 let pdfJsDoc       = null;
@@ -17,7 +24,7 @@ const canvas        = document.getElementById('pdf-canvas');
 const ctx           = canvas.getContext('2d');
 const labelsLayer   = document.getElementById('labels-layer');
 const pageInfo      = document.getElementById('page-info');
-const fileInput     = document.getElementById('file-input');
+const openBtn       = document.getElementById('open-btn');
 const fontSizeEl    = document.getElementById('font-size');
 const colorEl       = document.getElementById('color');
 const prevBtn       = document.getElementById('prev-page');
@@ -215,8 +222,6 @@ async function generatePDF() {
   generateBtn.textContent = 'Generando…';
 
   try {
-    const { PDFDocument, StandardFonts, rgb } = PDFLib;
-
     const pdfDoc = await PDFDocument.load(originalPdfBytes);
     const font   = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const pages  = pdfDoc.getPages();
@@ -241,10 +246,14 @@ async function generatePDF() {
     }
 
     const pdfBytes = await pdfDoc.save();
-    downloadFile(pdfBytes, 'filled.pdf', 'application/pdf');
+    const path = await save({
+      defaultPath: 'filled.pdf',
+      filters: [{ name: 'PDF', extensions: ['pdf'] }],
+    });
+    if (path) await writeFile(path, pdfBytes);
   } catch (err) {
     console.error(err);
-    alert('Error al generar el PDF:\n' + err.message);
+    await message('Error al generar el PDF:\n' + err.message, { kind: 'error' });
   } finally {
     generateBtn.disabled    = false;
     generateBtn.textContent = '⬇ Generar PDF';
@@ -260,14 +269,6 @@ function hexToRgb(hex) {
   ];
 }
 
-function downloadFile(bytes, filename, mime) {
-  const blob = new Blob([bytes], { type: mime });
-  const url  = URL.createObjectURL(blob);
-  const a    = Object.assign(document.createElement('a'), { href: url, download: filename });
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
 // ─── Insert mode toggle ───────────────────────────────────────────────────────
 insertBtn.addEventListener('click', () => {
   insertMode = !insertMode;
@@ -276,10 +277,14 @@ insertBtn.addEventListener('click', () => {
 });
 
 // ─── Toolbar events ───────────────────────────────────────────────────────────
-fileInput.addEventListener('change', async e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  await loadPDF(await file.arrayBuffer());
+openBtn.addEventListener('click', async () => {
+  const path = await open({
+    multiple: false,
+    filters: [{ name: 'PDF', extensions: ['pdf'] }],
+  });
+  if (!path) return;
+  const bytes = await readFile(path);
+  await loadPDF(bytes.buffer);
 });
 
 prevBtn.addEventListener('click', async () => {
@@ -301,3 +306,27 @@ zoomOutBtn.addEventListener('click', async () => {
 });
 
 generateBtn.addEventListener('click', generatePDF);
+
+// ─── Créditos ─────────────────────────────────────────────────────────────────
+const creditsModal = document.getElementById('credits-modal');
+
+document.getElementById('credits-btn').addEventListener('click', async () => {
+  try {
+    document.getElementById('app-version').textContent = 'v' + await getVersion();
+  } catch { /* fuera de Tauri */ }
+  creditsModal.classList.add('open');
+});
+document.getElementById('credits-close').addEventListener('click', () =>
+  creditsModal.classList.remove('open'));
+creditsModal.addEventListener('click', e => {
+  if (e.target === creditsModal) creditsModal.classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') creditsModal.classList.remove('open');
+});
+creditsModal.addEventListener('click', e => {
+  const a = e.target.closest('a[data-external]');
+  if (!a) return;
+  e.preventDefault();
+  openUrl(a.href);
+});

@@ -1,0 +1,61 @@
+name: Release
+
+# Solo corre al publicar un release en GitHub
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: corepack enable
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with: { workspaces: src-tauri }
+      - name: Dependencias del sistema
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential libssl-dev libxdo-dev libayatana-appindicator3-dev librsvg2-dev
+      - run: yarn install --immutable
+      - run: ./scripts/deploy-linux.sh
+      - name: Subir al release
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh release upload "${{ github.event.release.tag_name }}" release/linux/* --clobber
+
+  windows-msix:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: corepack enable
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with: { workspaces: src-tauri }
+      - run: yarn install --immutable
+      # Con secrets WINDOWS_PFX_BASE64 / WINDOWS_PFX_PASSWORD / WINDOWS_PUBLISHER firma el MSIX;
+      # sin ellos genera uno sin firmar (válido para subir a Microsoft Store, que firma por su cuenta).
+      - name: Construir MSIX
+        shell: pwsh
+        env:
+          PFX_B64: ${{ secrets.WINDOWS_PFX_BASE64 }}
+          PFX_PASS: ${{ secrets.WINDOWS_PFX_PASSWORD }}
+          PUBLISHER: ${{ secrets.WINDOWS_PUBLISHER }}
+        run: |
+          if ($env:PFX_B64 -and $env:PUBLISHER) {
+            [IO.File]::WriteAllBytes("cert.pfx", [Convert]::FromBase64String($env:PFX_B64))
+            ./scripts/deploy-windows.ps1 -Pfx cert.pfx -PfxPassword $env:PFX_PASS -Publisher $env:PUBLISHER
+          } else {
+            ./scripts/deploy-windows.ps1
+          }
+      - name: Subir al release
+        shell: pwsh
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh release upload "${{ github.event.release.tag_name }}" (Get-ChildItem release/windows/*.msix).FullName --clobber

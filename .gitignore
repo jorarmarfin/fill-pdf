@@ -15,3 +15,10 @@ node_modules
 
 #!.yarn/cache
 .pnp.*
+dist
+src-tauri/target
+src-tauri/gen
+release
+*-llenada.pdf
+*-llenada.PDF
+Solicitud-llenada.pdf
